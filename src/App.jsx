@@ -12,7 +12,7 @@ export default function App() {
   const [timerRunning, setTimerRunning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
-  
+
   useEffect(() => {
     fetch(
       "https://opensheet.elk.sh/1s3YjqTPWm1GrWl3DcAwMn4NVjg8B2Uh8qBRFjPEwJk4/Sheet1"
@@ -40,22 +40,23 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!hasStarted) return;
+    if (!hasStarted || isPaused) return;
     const timer = setInterval(() => {
       setQuestionTime((t) => t + 1);
     }, 1000);
     return () => clearInterval(timer);
-  }, [currentIndex, hasStarted]);
-  const formatTime = (s) =>
-    `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(
-      2,
-      "0"
-    )}`;
+  }, [currentIndex, hasStarted, isPaused]);
 
   const current = questions[currentIndex];
   const selected = selectedOptions[currentIndex];
   const progress =
     questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+
+  const formatTime = (s) =>
+    `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(
+      2,
+      "0"
+    )}`;
 
   const handleSelect = (val) => {
     setSelectedOptions({ ...selectedOptions, [currentIndex]: val });
@@ -98,16 +99,45 @@ export default function App() {
   if (!hasStarted) {
     return (
       <div className="p-6 max-w-2xl mx-auto text-center">
-        <h1 className="text-3xl font-bold mb-4"> CR Session 1 Practice Questions </h1>
-        <p><strong>Quiz Guidelines</strong></p>
-        <p><strong>Answer Questions:</strong> Select an answer (A–E) and click “Submit.”</p>
-        <p><strong>View Feedback:</strong> After submitting, see if you were correct and review the explanation.</p>
-        <p><strong>Skip Questions:</strong> If unsure, you can skip the question and move on to the next one.</p>
-        <p><strong>Pause Timer:</strong> Use the “Pause Timer” button to stop the timer if needed, and resume it when ready.</p>
-        <p><strong>Proceed:</strong> Click “Next Question” to continue after viewing feedback.</p>
-        <p><strong>Finish:</strong> After the last question, click “End Quiz” to see your results.</p>
-        <p><strong>Results:</strong> Check your correct answers, skipped questions, and time per question.</p>
-        <p><strong>Retake:</strong> Click “Retake Quiz” if you’d like to try again.</p>
+        <h1 className="text-3xl font-bold mb-4">
+          {" "}
+          CR Session 1 Practice Questions{" "}
+        </h1>
+        <p>
+          <strong>Quiz Guidelines</strong>
+        </p>
+        <p>
+          <strong>Answer Questions:</strong> Select an answer (A–E) and click
+          “Submit.”
+        </p>
+        <p>
+          <strong>View Feedback:</strong> After submitting, see if you were
+          correct and review the explanation.
+        </p>
+        <p>
+          <strong>Skip Questions:</strong> If unsure, you can skip the question
+          and move on to the next one.
+        </p>
+        <p>
+          <strong>Pause Timer:</strong> Use the “Pause Timer” button to stop the
+          timer if needed, and resume it when ready.
+        </p>
+        <p>
+          <strong>Proceed:</strong> Click “Next Question” to continue after
+          viewing feedback.
+        </p>
+        <p>
+          <strong>Finish:</strong> After the last question, click “End Quiz” to
+          see your results.
+        </p>
+        <p>
+          <strong>Results:</strong> Check your correct answers, skipped
+          questions, and time per question.
+        </p>
+        <p>
+          <strong>Retake:</strong> Click “Retake Quiz” if you’d like to try
+          again.
+        </p>
         <p className="text-center text-lg mt-4 font-medium">Good luck!</p>
         <button
           onClick={() => setHasStarted(true)}
@@ -270,4 +300,3 @@ export default function App() {
     </div>
   );
 }
-
