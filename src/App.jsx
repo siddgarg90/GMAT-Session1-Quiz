@@ -11,6 +11,7 @@ export default function App() {
   const [questionTimes, setQuestionTimes] = useState([]);
   const [timerRunning, setTimerRunning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
 
   useEffect(() => {
     fetch(
@@ -39,21 +40,23 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!timerRunning || isPaused) return;
-    const timer = setInterval(() => setQuestionTime((t) => t + 1), 1000);
+    if (!hasStarted || isPaused) return;
+    const timer = setInterval(() => {
+      setQuestionTime((t) => t + 1);
+    }, 1000);
     return () => clearInterval(timer);
-  }, [timerRunning, isPaused, currentIndex]);
+  }, [currentIndex, hasStarted, isPaused]);
+
+  const current = questions[currentIndex];
+  const selected = selectedOptions[currentIndex];
+  const progress =
+    questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
 
   const formatTime = (s) =>
     `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(
       2,
       "0"
     )}`;
-
-  const current = questions[currentIndex];
-  const selected = selectedOptions[currentIndex];
-  const progress =
-    questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
 
   const handleSelect = (val) => {
     setSelectedOptions({ ...selectedOptions, [currentIndex]: val });
@@ -87,10 +90,61 @@ export default function App() {
     setQuestionTime(0);
     setTimerRunning(true);
     setIsPaused(false);
+    setHasStarted(false);
   };
 
   if (questions.length === 0)
     return <div className="p-6">Loading questions...</div>;
+
+  if (!hasStarted) {
+    return (
+      <div className="p-6 max-w-2xl mx-auto text-center">
+        <h1 className="text-3xl font-bold mb-4"> CR Practice Questions </h1>
+        <p>
+          <strong>Quiz Guidelines</strong>
+        </p>
+        <p>
+          <strong>Answer Questions:</strong> Select an answer (A–E) and click
+          “Submit.”
+        </p>
+        <p>
+          <strong>View Feedback:</strong> After submitting, see if you were
+          correct and review the explanation.
+        </p>
+        <p>
+          <strong>Skip Questions:</strong> If unsure, you can skip the question
+          and move on to the next one.
+        </p>
+        <p>
+          <strong>Pause Timer:</strong> Use the “Pause Timer” button to stop the
+          timer if needed, and resume it when ready.
+        </p>
+        <p>
+          <strong>Proceed:</strong> Click “Next Question” to continue after
+          viewing feedback.
+        </p>
+        <p>
+          <strong>Finish:</strong> After the last question, click “End Quiz” to
+          see your results.
+        </p>
+        <p>
+          <strong>Results:</strong> Check your correct answers, skipped
+          questions, and time per question.
+        </p>
+        <p>
+          <strong>Retake:</strong> Click “Retake Quiz” if you’d like to try
+          again.
+        </p>
+        <p className="text-center text-lg mt-4 font-medium">Good luck!</p>
+        <button
+          onClick={() => setHasStarted(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded text-lg"
+        >
+          Start Quiz
+        </button>
+      </div>
+    );
+  }
 
   if (quizFinished) {
     const score = questions.filter(
@@ -243,3 +297,4 @@ export default function App() {
     </div>
   );
 }
+
